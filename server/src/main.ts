@@ -3,10 +3,12 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import path from 'path';
-import mongoose from 'mongoose';
+import mongoose, { Error } from 'mongoose';
 import cors from 'cors';
+import passport from 'passport';
 
 import User from './models/users.model';
+import { IVerifyOptions } from 'passport-local';
 
 dotenv.config();
 
@@ -14,6 +16,9 @@ const app = express();
 const origin = process.env.ORIGIN;
 app.use(cors({ origin, credentials: true }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+app.use(passport.session());
+require('./config/passport');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); // form태그 내용 받으려면
@@ -48,6 +53,23 @@ app.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     console.error(err);
   }
+});
+
+app.post('/login', (req: Request, res: Response, next: NextFunction) => {
+  // 콜백부분 -> passport.ts
+  passport.authenticate('local', (err: Error, user: any, info: IVerifyOptions) => {
+    if (err) return next(err);
+
+    if (!user) {
+      console.log('no user found');
+      return res.json({ message: info });
+    }
+
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+      res.redirect('/');
+    });
+  })(req, res, next);
 });
 
 app.listen(`${process.env.PORT}`, async () => {
