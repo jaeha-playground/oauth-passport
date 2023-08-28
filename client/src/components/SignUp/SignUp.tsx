@@ -10,9 +10,10 @@ export default function SignUp() {
   };
   const [field, setField] = useState(initialState);
 
-  const submitSignUpForm = async () => {
+  const submitSignUpForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
-      axiosInstance.post('/signup', {
+      await axiosInstance.post('/signup', {
         email: field.email,
         password: field.password,
       });
@@ -39,7 +40,7 @@ export default function SignUp() {
         </section>
         <section>
           <label>Password</label>
-          <input type="password" required />
+          <input type="password" required onChange={(e) => handleInputChange('password', e.target.value)} />
         </section>
         <button type="submit">Sign Up</button>
       </form>
