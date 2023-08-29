@@ -1,5 +1,23 @@
-import mongoose, { Error } from 'mongoose';
+import mongoose, { Document, Error } from 'mongoose';
 import bcrypt from 'bcrypt';
+
+export interface IUser extends Document {
+  email: {
+    type: string;
+    unique: boolean;
+  };
+  password: {
+    type: string;
+    minLength: number;
+  };
+  googleId: {
+    type: string;
+    unique: boolean;
+    sparse: boolean;
+  };
+
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
 
 const userSchema = new mongoose.Schema({
   email: {

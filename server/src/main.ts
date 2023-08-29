@@ -6,6 +6,7 @@ import path from 'path';
 import mongoose, { Error } from 'mongoose';
 import cors from 'cors';
 import passport from 'passport';
+import cookieSession from 'cookie-session';
 
 import User from './models/users.model';
 import { IVerifyOptions } from 'passport-local';
@@ -16,6 +17,31 @@ const app = express();
 const origin = process.env.ORIGIN;
 app.use(cors({ origin, credentials: true }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
+
+// session cookie에 저장
+app.use(
+  cookieSession({
+    name: 'OAuth',
+    maxAge: 1209600000,
+    keys: [`${process.env.COOKIE_ENCRYPTION_KEY}`],
+  })
+);
+
+// req.session.regenerate is not a function using passport 0.6.0
+app.use((request, response, next) => {
+  if (request.session && !request.session.regenerate) {
+    request.session.regenerate = (cb: any) => {
+      cb();
+    };
+  }
+  if (request.session && !request.session.save) {
+    request.session.save = (cb: any) => {
+      cb();
+    };
+  }
+  next();
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 require('./config/passport');
@@ -31,7 +57,7 @@ mongoose
     `mongodb+srv://jaehafe:${process.env.MONGODB_PASSWORD}@oauth.b8fiqds.mongodb.net/?retryWrites=true&w=majority`
   )
   .then(() => console.log('mongodb connected!'))
-  .catch((err) => {
+  .catch((err: Error) => {
     console.error(err);
   });
 
@@ -59,7 +85,7 @@ app.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
 // 로그인
 app.post('/login', (req: Request, res: Response, next: NextFunction) => {
   // 콜백부분 -> passport.ts
-  passport.authenticate('local', (err: Error, user: any, info: IVerifyOptions) => {
+  passport.authenticate('local', (err: any, user: any, info: IVerifyOptions) => {
     if (err) return next(err);
 
     if (!user) {
@@ -71,6 +97,8 @@ app.post('/login', (req: Request, res: Response, next: NextFunction) => {
     // req.user = user
     req.logIn(user, (err) => {
       if (err) return next(err);
+      console.log('123');
+
       res.redirect('/');
     });
   })(req, res, next);

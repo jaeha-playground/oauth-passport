@@ -3,8 +3,11 @@
 import React, { useState } from 'react';
 
 import { axiosInstance } from '@/apis/axiosConfigs';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
+  const router = useRouter();
+
   const initialState = {
     email: '',
     password: '',
@@ -20,6 +23,7 @@ export default function Login() {
         email: field.email,
         password: field.password,
       });
+      router.push('/');
     } catch (error) {
       console.error(error);
       alert('오류 발생');
