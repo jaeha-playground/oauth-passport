@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
   res.send('server is running!');
 });
 
+// 회원가입
 app.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   console.log('123');
 
@@ -55,6 +56,7 @@ app.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// 로그인
 app.post('/login', (req: Request, res: Response, next: NextFunction) => {
   // 콜백부분 -> passport.ts
   passport.authenticate('local', (err: Error, user: any, info: IVerifyOptions) => {
@@ -65,6 +67,8 @@ app.post('/login', (req: Request, res: Response, next: NextFunction) => {
       return res.json({ message: info });
     }
 
+    // 여기서 세션 생성
+    // req.user = user
     req.logIn(user, (err) => {
       if (err) return next(err);
       res.redirect('/');

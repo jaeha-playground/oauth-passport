@@ -6,6 +6,21 @@ import User from '../models/users.model';
 
 const LocalStrategy = passportLocal.Strategy;
 
+// req.login(user)
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
+});
+
+// client -> session -> request
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 passport.use(
   new LocalStrategy({ usernameField: 'email', passwordField: 'password' }, (email, password, done) => {
     User.findOne({ email: email.toLowerCase() }, (err: Error, user: any) => {
