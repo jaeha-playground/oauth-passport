@@ -1,9 +1,15 @@
 'use client';
 
-import { axiosInstance } from '@/apis/axiosConfigs';
 import React, { useState } from 'react';
 
+import { axiosInstance } from '@/apis/axiosConfigs';
+
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
 export default function SignUp() {
+  const router = useRouter();
+
   const initialState = {
     email: '',
     password: '',
@@ -17,6 +23,7 @@ export default function SignUp() {
         email: field.email,
         password: field.password,
       });
+      router.push('/login');
     } catch (error) {
       console.error(error);
       alert('오류 발생');
@@ -44,7 +51,7 @@ export default function SignUp() {
         </section>
         <button type="submit">Sign Up</button>
       </form>
-      <a href="/login">Go to Login</a>
+      <Link href="/login">Go to Login</Link>
     </section>
   );
 }

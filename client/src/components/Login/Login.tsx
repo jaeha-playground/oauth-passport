@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 
 import { axiosInstance } from '@/apis/axiosConfigs';
+
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Login() {
   const router = useRouter();
@@ -52,7 +54,7 @@ export default function Login() {
         </section>
         <button type="submit">Login</button>
       </form>
-      <a href="/SignUp">Sign Up</a>
+      <Link href="/signup">Sign Up</Link>
     </section>
   );
 }
