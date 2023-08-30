@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -6,13 +6,14 @@ import path from 'path';
 import mongoose, { Error } from 'mongoose';
 import cors from 'cors';
 import passport from 'passport';
-import { IVerifyOptions } from 'passport-local';
+
 import cookieSession from 'cookie-session';
 import config from 'config';
 
-import User from './models/users.model';
+const serverConfig = config.get<any>('server');
 
-import authMiddlewares from './middlewares/auth';
+import mainRouter from './routes/main.router';
+import usersRouter from './routes/users.router';
 
 dotenv.config();
 
@@ -62,66 +63,10 @@ mongoose
     console.error(err);
   });
 
-app.get('/', authMiddlewares.checkAuthenticated, (req, res) => {
-  res.send('server is running!');
-});
-
-// 회원가입
-app.post('/signup', authMiddlewares.checkNotAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
-  console.log('123');
-
-  const user = new User(req.body);
-  console.log('req.body>>>', req.body);
-
-  try {
-    await user.save();
-    res.redirect('http://localhost:3000/login');
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-// 구글 로그인
-app.get('/auth/google', passport.authenticate('google'));
-app.get(
-  '/auth/google/callback',
-  passport.authenticate('google', {
-    successReturnToOrRedirect: 'http://localhost:3000',
-    failureRedirect: 'http://localhost:3000/login',
-  })
-);
-
-// 로그인
-app.post('/login', authMiddlewares.checkNotAuthenticated, (req: Request, res: Response, next: NextFunction) => {
-  // 콜백부분 -> passport.ts
-  passport.authenticate('local', (err: any, user: any, info: IVerifyOptions) => {
-    if (err) return next(err);
-
-    if (!user) {
-      console.log('no user found');
-      return res.json({ message: info });
-    }
-
-    // 여기서 세션 생성
-    // req.user = user
-    req.logIn(user, (err) => {
-      if (err) return next(err);
-      console.log('123');
-
-      res.redirect('http://localhost:3000');
-    });
-  })(req, res, next);
-});
-
-app.post('/logout', (req: Request, res: Response, next: NextFunction) => {
-  req.logOut((err) => {
-    if (err) return next(err);
-
-    return res.status(200).json({ message: 'logout success' });
-  });
-});
-
-const serverConfig = config.get<any>('server');
+// mainRouter
+app.use('/', mainRouter);
+// usersRouter
+app.use('/auth', usersRouter);
 
 app.listen(serverConfig.port, async () => {
   console.log(`Server is running on ${serverConfig.port}`);

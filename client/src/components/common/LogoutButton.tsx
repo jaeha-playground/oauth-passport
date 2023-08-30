@@ -13,7 +13,7 @@ export default function LogoutButton() {
     e.preventDefault();
 
     try {
-      const res = await axiosInstance.post('/logout');
+      const res = await axiosInstance.post('/auth/logout');
       console.log('res>>>', res);
 
       console.log('logout');

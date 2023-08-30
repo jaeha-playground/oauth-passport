@@ -14,9 +14,9 @@ const checkNotAuthenticated = (req: Request, res: Response, next: NextFunction) 
   next();
 };
 
-const authMiddlewares = {
+const authMiddleware = {
   checkAuthenticated,
   checkNotAuthenticated,
 };
 
-export default authMiddlewares;
+export default authMiddleware;

@@ -22,7 +22,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      await axiosInstance.post('/login', {
+      await axiosInstance.post('/auth/login', {
         email: field.email,
         password: field.password,
       });

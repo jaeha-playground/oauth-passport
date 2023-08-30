@@ -19,11 +19,11 @@ export default function SignUp() {
   const submitSignUpForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await axiosInstance.post('/signup', {
+      await axiosInstance.post('/auth/signup', {
         email: field.email,
         password: field.password,
       });
-      router.push('/login');
+      router.push('/auth/login');
     } catch (error) {
       console.error(error);
       alert('오류 발생');
