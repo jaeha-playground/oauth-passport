@@ -48,9 +48,9 @@ const localStrategyConfig = new LocalStrategy(
 passport.use('local', localStrategyConfig);
 
 // google 전략
-const googleClientID = `${process.env.googleClientID}`;
-const googleClientSecret = `${process.env.googleClientSecret}`;
-const googleCallbackURL = `${process.env.googleCallbackURL}`;
+const googleClientID = `${process.env.GOOGLE_CLIENT_ID}`;
+const googleClientSecret = `${process.env.GOOGLE_CLIENT_SECRET}`;
+const googleCallbackURL = `${process.env.GOOGLE_CALLBACK_URL}`;
 const googleStrategyConfig = new GoogleStrategy(
   {
     clientID: googleClientID,

@@ -8,6 +8,7 @@ import cors from 'cors';
 import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
 import cookieSession from 'cookie-session';
+import config from 'config';
 
 import User from './models/users.model';
 
@@ -55,9 +56,7 @@ app.use(morgan('dev'));
 
 // mongodb 연결
 mongoose
-  .connect(
-    `mongodb+srv://jaehafe:${process.env.MONGODB_PASSWORD}@oauth.b8fiqds.mongodb.net/?retryWrites=true&w=majority`
-  )
+  .connect(`${process.env.MONGO_URI}`)
   .then(() => console.log('mongodb connected!'))
   .catch((err: Error) => {
     console.error(err);
@@ -122,6 +121,8 @@ app.post('/logout', (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(`${process.env.PORT}`, async () => {
-  console.log(`Server is running on ${process.env.PORT}`);
+const serverConfig = config.get<any>('server');
+
+app.listen(serverConfig.port, async () => {
+  console.log(`Server is running on ${serverConfig.port}`);
 });
