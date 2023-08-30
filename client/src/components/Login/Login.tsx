@@ -54,6 +54,8 @@ export default function Login() {
         </section>
         <button type="submit">Login</button>
       </form>
+      <Link href="http://localhost:4000/auth/google">Login with Google Account</Link>
+      <br />
       <Link href="/signup">Sign Up</Link>
     </section>
   );
