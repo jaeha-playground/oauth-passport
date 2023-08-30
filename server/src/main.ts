@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -6,10 +6,14 @@ import path from 'path';
 import mongoose, { Error } from 'mongoose';
 import cors from 'cors';
 import passport from 'passport';
-import cookieSession from 'cookie-session';
 
-import User from './models/users.model';
-import { IVerifyOptions } from 'passport-local';
+import cookieSession from 'cookie-session';
+import config from 'config';
+
+const serverConfig = config.get<any>('server');
+
+import mainRouter from './routes/main.router';
+import usersRouter from './routes/users.router';
 
 dotenv.config();
 
@@ -53,57 +57,17 @@ app.use(morgan('dev'));
 
 // mongodb 연결
 mongoose
-  .connect(
-    `mongodb+srv://jaehafe:${process.env.MONGODB_PASSWORD}@oauth.b8fiqds.mongodb.net/?retryWrites=true&w=majority`
-  )
+  .connect(`${process.env.MONGO_URI}`)
   .then(() => console.log('mongodb connected!'))
   .catch((err: Error) => {
     console.error(err);
   });
 
-app.get('/', (req, res) => {
-  res.send('server is running!');
-});
+// mainRouter
+app.use('/', mainRouter);
+// usersRouter
+app.use('/auth', usersRouter);
 
-// 회원가입
-app.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
-  console.log('123');
-
-  const user = new User(req.body);
-  console.log('req.body>>>', req.body);
-
-  try {
-    await user.save();
-    return res.status(200).json({
-      success: true,
-    });
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-// 로그인
-app.post('/login', (req: Request, res: Response, next: NextFunction) => {
-  // 콜백부분 -> passport.ts
-  passport.authenticate('local', (err: any, user: any, info: IVerifyOptions) => {
-    if (err) return next(err);
-
-    if (!user) {
-      console.log('no user found');
-      return res.json({ message: info });
-    }
-
-    // 여기서 세션 생성
-    // req.user = user
-    req.logIn(user, (err) => {
-      if (err) return next(err);
-      console.log('123');
-
-      res.redirect('/');
-    });
-  })(req, res, next);
-});
-
-app.listen(`${process.env.PORT}`, async () => {
-  console.log(`Server is running on ${process.env.PORT}`);
+app.listen(serverConfig.port, async () => {
+  console.log(`Server is running on ${serverConfig.port}`);
 });

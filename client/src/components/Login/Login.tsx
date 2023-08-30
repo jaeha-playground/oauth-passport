@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 
 import { axiosInstance } from '@/apis/axiosConfigs';
+
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Login() {
   const router = useRouter();
@@ -18,8 +20,9 @@ export default function Login() {
 
   const submitLoginForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
-      await axiosInstance.post('/login', {
+      await axiosInstance.post('/auth/login', {
         email: field.email,
         password: field.password,
       });
@@ -51,7 +54,9 @@ export default function Login() {
         </section>
         <button type="submit">Login</button>
       </form>
-      <a href="/SignUp">Sign Up</a>
+      <Link href="http://localhost:4000/auth/google">Login with Google Account</Link>
+      <br />
+      <Link href="/signup">Sign Up</Link>
     </section>
   );
 }

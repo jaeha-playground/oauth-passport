@@ -1,5 +1,5 @@
 import mongoose, { Document, Error } from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
   email: {
@@ -19,7 +19,7 @@ export interface IUser extends Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<any>({
   email: {
     type: String,
     unique: true,
@@ -42,20 +42,40 @@ const userSchema = new mongoose.Schema({
 //   });
 // };
 
+const saltRounds = 10;
+userSchema.pre('save', function (next) {
+  let user = this;
+  console.log('user>>>', user);
+
+  // 비밀번호 변경될 때만
+  if (user.isModified('password')) {
+    // salt된 비밀번호 생성
+    bcrypt.genSalt(saltRounds, (err, salt) => {
+      if (err) return next(err);
+
+      bcrypt.hash(user.password, salt, function (err, hashedPassword) {
+        if (err) return next(err);
+        user.password = hashedPassword;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
+});
+
 userSchema.methods.comparePassword = function (
   plainPassword: string,
   cb: (err: Error | null, isMatch: boolean) => void
 ) {
-  if (plainPassword === this.password) {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-  // return cb(null, false);
-  // bcrypt.compare(plainPassword, this.password, function (err, isMatch) {
-  //   if (err) return cb(err, false);
-  //   cb(null, isMatch);
-  // });
+  // bcrypt compare
+  // plain -> client password
+  // this.password -> db password
+
+  bcrypt.compare(plainPassword, this.password, (err, isMatch) => {
+    if (err) return cb(err, false);
+    cb(null, isMatch);
+  });
 };
 
 const User = mongoose.model('User', userSchema);
