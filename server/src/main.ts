@@ -106,6 +106,14 @@ app.post('/login', authMiddlewares.checkNotAuthenticated, (req: Request, res: Re
   })(req, res, next);
 });
 
+app.post('/logout', (req: Request, res: Response, next: NextFunction) => {
+  req.logOut((err) => {
+    if (err) return next(err);
+
+    return res.status(200).json({ message: 'logout success' });
+  });
+});
+
 app.listen(`${process.env.PORT}`, async () => {
   console.log(`Server is running on ${process.env.PORT}`);
 });

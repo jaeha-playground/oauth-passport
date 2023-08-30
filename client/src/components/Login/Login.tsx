@@ -18,6 +18,7 @@ export default function Login() {
 
   const submitLoginForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
       await axiosInstance.post('/login', {
         email: field.email,
