@@ -76,13 +76,21 @@ app.post('/signup', authMiddlewares.checkNotAuthenticated, async (req: Request, 
 
   try {
     await user.save();
-    return res.status(200).json({
-      success: true,
-    });
+    res.redirect('http://localhost:3000/login');
   } catch (err) {
     console.error(err);
   }
 });
+
+// 구글 로그인
+app.get('/auth/google', passport.authenticate('google'));
+app.get(
+  '/auth/google/callback',
+  passport.authenticate('google', {
+    successReturnToOrRedirect: 'http://localhost:3000',
+    failureRedirect: 'http://localhost:3000/login',
+  })
+);
 
 // 로그인
 app.post('/login', authMiddlewares.checkNotAuthenticated, (req: Request, res: Response, next: NextFunction) => {
@@ -101,7 +109,7 @@ app.post('/login', authMiddlewares.checkNotAuthenticated, (req: Request, res: Re
       if (err) return next(err);
       console.log('123');
 
-      res.redirect('/');
+      res.redirect('http://localhost:3000');
     });
   })(req, res, next);
 });
