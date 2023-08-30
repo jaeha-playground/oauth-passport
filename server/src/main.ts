@@ -6,10 +6,12 @@ import path from 'path';
 import mongoose, { Error } from 'mongoose';
 import cors from 'cors';
 import passport from 'passport';
+import { IVerifyOptions } from 'passport-local';
 import cookieSession from 'cookie-session';
 
 import User from './models/users.model';
-import { IVerifyOptions } from 'passport-local';
+
+import authMiddlewares from './middlewares/auth';
 
 dotenv.config();
 
@@ -61,12 +63,12 @@ mongoose
     console.error(err);
   });
 
-app.get('/', (req, res) => {
+app.get('/', authMiddlewares.checkAuthenticated, (req, res) => {
   res.send('server is running!');
 });
 
 // 회원가입
-app.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
+app.post('/signup', authMiddlewares.checkNotAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   console.log('123');
 
   const user = new User(req.body);
@@ -83,7 +85,7 @@ app.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // 로그인
-app.post('/login', (req: Request, res: Response, next: NextFunction) => {
+app.post('/login', authMiddlewares.checkNotAuthenticated, (req: Request, res: Response, next: NextFunction) => {
   // 콜백부분 -> passport.ts
   passport.authenticate('local', (err: any, user: any, info: IVerifyOptions) => {
     if (err) return next(err);
