@@ -9,7 +9,7 @@ const getEmailData = (to: string, name: string, template: string) => {
   switch (template) {
     case 'welcome':
       data = {
-        from: '보내는 사람 이름 <userId@gmail.com>',
+        from: '',
         to,
         subject: `Hello ${name}`,
         html: welcome(),
@@ -18,7 +18,7 @@ const getEmailData = (to: string, name: string, template: string) => {
 
     case 'goodbye':
       data = {
-        from: '보내는 사람 이름 <userId@gmail.com>',
+        from: '',
         to,
         subject: `Goodbye ${name}`,
         html: goodbye(),
@@ -36,7 +36,7 @@ const sendMail = (to: string, name: string, type: string) => {
     service: 'Gmail',
     auth: {
       user: '',
-      pass: '',
+      pass: process.env.GOOGLE_EMAIL_PASSWORD,
     },
   });
 

@@ -54,7 +54,7 @@ usersRouter.post(
     try {
       await user.save();
       // 가입 축하 이메일
-      sendMail();
+      sendMail('', 'Adam', 'welcome');
       res.redirect('http://localhost:3000/login');
     } catch (err) {
       console.error(err);
