@@ -6,6 +6,8 @@ import authMiddleware from '../middleware/auth';
 
 import User from '../models/users.model';
 
+import sendMail from '../mail/mail';
+
 const usersRouter = express.Router();
 
 // 로그인
@@ -51,6 +53,8 @@ usersRouter.post(
 
     try {
       await user.save();
+      // 가입 축하 이메일
+      sendMail();
       res.redirect('http://localhost:3000/login');
     } catch (err) {
       console.error(err);
