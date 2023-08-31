@@ -19,7 +19,7 @@ dotenv.config();
 
 const app = express();
 const origin = process.env.ORIGIN;
-app.use(cors({ origin, credentials: true }));
+app.use(cors({ origin, credentials: true, optionsSuccessStatus: 200 }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // session cookie에 저장

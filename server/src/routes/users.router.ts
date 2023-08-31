@@ -6,6 +6,8 @@ import authMiddleware from '../middleware/auth';
 
 import User from '../models/users.model';
 
+import sendMail from '../mail/mail';
+
 const usersRouter = express.Router();
 
 // 로그인
@@ -51,6 +53,8 @@ usersRouter.post(
 
     try {
       await user.save();
+      // 가입 축하 이메일
+      sendMail('', 'Adam', 'welcome');
       res.redirect('http://localhost:3000/login');
     } catch (err) {
       console.error(err);
@@ -63,6 +67,16 @@ usersRouter.get('/google', passport.authenticate('google'));
 usersRouter.get(
   '/google/callback',
   passport.authenticate('google', {
+    successReturnToOrRedirect: 'http://localhost:3000',
+    failureRedirect: 'http://localhost:3000/login',
+  })
+);
+
+// 카카오 로그인
+usersRouter.get('/kakao', passport.authenticate('kakao'));
+usersRouter.get(
+  '/kakao/callback',
+  passport.authenticate('kakao', {
     successReturnToOrRedirect: 'http://localhost:3000',
     failureRedirect: 'http://localhost:3000/login',
   })

@@ -1,6 +1,7 @@
 import passport from 'passport';
 import passportLocal from 'passport-local';
 import passportGoogle from 'passport-google-oauth20';
+// import passportKakao from 'passport-kakao';
 
 import { Error } from 'mongoose';
 
@@ -8,6 +9,8 @@ import User from '../models/users.model';
 
 const LocalStrategy = passportLocal.Strategy;
 const GoogleStrategy = passportGoogle.Strategy;
+// const KakaoStrategy = passportKakao.Strategy;
+const KakaoStrategy = require('passport-kakao').Strategy;
 
 // req.login(user)
 passport.serializeUser((user: any, done) => {
@@ -72,17 +75,39 @@ const googleStrategyConfig = new GoogleStrategy(
         user.email = profile.emails[0].value;
         user.googleId = profile.id;
         user.save().then((err) => done(err, user));
-
-        // try {
-        //   user.save();
-        // } catch (error) {
-        //   done(error, user);
-        // }
       }
     } catch (error) {
       return done(error);
     }
   }
 );
-
 passport.use('google', googleStrategyConfig);
+
+// kakao 전략
+const kakaoClientID = `${process.env.KAKAO_CLIENT_ID}`;
+const kakaoCallbackURL = `${process.env.KAKAO_CALLBACK_URL}`;
+const kakaoStrategyConfig = new KakaoStrategy(
+  {
+    clientID: kakaoClientID,
+    callbackURL: kakaoCallbackURL,
+  },
+  async (accessToken: string, refreshToken: string, profile: any, done: any) => {
+    console.log('profile>>', profile);
+
+    try {
+      const user = await User.findOne({ kakaoId: profile.id });
+
+      if (user) {
+        return done(null, user);
+      } else {
+        const user = new User();
+        user.kakaoId = profile.id;
+        user.email = profile._json.kakao_account.email;
+        user.save().then((err) => done(err, user));
+      }
+    } catch (error) {
+      return done(error);
+    }
+  }
+);
+passport.use('kakao', kakaoStrategyConfig);
