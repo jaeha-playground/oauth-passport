@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema<any>({
     unique: true,
     sparse: true,
   },
+  kakaoId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
 });
 
 // userSchema.methods.comparePassword = function (plainPassword: string, cb) {

@@ -72,4 +72,14 @@ usersRouter.get(
   })
 );
 
+// 카카오 로그인
+usersRouter.get('/kakao', passport.authenticate('kakao'));
+usersRouter.get(
+  '/kakao/callback',
+  passport.authenticate('kakao', {
+    successReturnToOrRedirect: 'http://localhost:3000',
+    failureRedirect: 'http://localhost:3000/login',
+  })
+);
+
 export default usersRouter;
