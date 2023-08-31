@@ -86,3 +86,5 @@ const googleStrategyConfig = new GoogleStrategy(
 );
 
 passport.use('google', googleStrategyConfig);
+
+// kakao 전략
